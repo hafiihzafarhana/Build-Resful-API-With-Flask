@@ -23,6 +23,11 @@ Command (CMD / Bash):
 - bash: `export FLASK_ENV=development`
 - CMD: `set FLASK_ENV=development`
 
+## What variable was set before?
+
+`export FLASK_ENV=development`
+`export FLASK_APP=flaskr`
+
 ## What package installed?
 
 ### After install flask: pip install Flask
@@ -40,3 +45,7 @@ Command (CMD / Bash):
 
 - `watchdog`
 - `Werkzeug`
+
+### After install python-dotenv: pip install python-dotenv
+
+- `python-dotenv`
