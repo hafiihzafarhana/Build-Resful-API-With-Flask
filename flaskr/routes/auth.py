@@ -1,4 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, request, jsonify
+from werkzeug.security import check_password_hash, generate_password_hash
+from flaskr.constants.http_status_codes import HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT, HTTP_201_CREATED
+import validators
+from flaskr.database.database import User, db
 
 # auth menajadi nama
 # __name__ digunakan untuk mengatur dimana blueprint akan berjalan
@@ -7,7 +11,58 @@ auth = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 @auth.post("/register")
 def register():
-    return "Register"
+    username = request.json['username']
+    email = request.json['email']
+    password = request.json['password']
+
+    if len(password) < 6:
+        return jsonify({
+            'message': "Your password is short. Minimum length password is 6"
+        }), HTTP_400_BAD_REQUEST
+
+    if len(username) < 3:
+        return jsonify({
+            'message': "Your username is short. Minimum length username is 6"
+        }), HTTP_400_BAD_REQUEST
+
+    # should 0-9 and a-z
+    if not username.isalnum() or " " in username:
+        return jsonify({
+            'message': "Your username is should alpha numeric and no spacing"
+        }), HTTP_400_BAD_REQUEST
+
+    # is email or not?
+    if not validators.email(email):
+        return jsonify({
+            'message': "This is not satisfied email"
+        }), HTTP_400_BAD_REQUEST
+
+    if User.query.filter_by(email=email).first() is not None:
+        return jsonify({
+            'message': "Email is taken"
+        }), HTTP_409_CONFLICT
+
+    if User.query.filter_by(username=username).first() is not None:
+        return jsonify({
+            'message': "Username is taken"
+        }), HTTP_409_CONFLICT
+
+    password_hash = generate_password_hash(password)
+
+    user = User(username=username, password=password_hash, email=email)
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'User registered',
+        'status': 'CREATED',
+        'data': {
+            "username": username,
+            "email": email,
+            "password": password_hash,
+        }
+    }), HTTP_201_CREATED
 
 
 @auth.get("/me")

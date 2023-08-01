@@ -29,27 +29,28 @@ Command (CMD / Bash):
 `export FLASK_APP=flaskr`
 
 ## Folder Structure
+
 - .venv
 - flaskr/
-    - config
-    - constant
-    - controllers
-    - database
-    - repositories
-    - routes
-    - services
-    - static
-    - templates
-    - utils
-    - __init__.py
-- tests/
-    - 
+  - config
+  - constant
+  - controllers
+  - database
+  - repositories
+  - routes
+  - services
+  - static
+  - templates
+  - utils
+  - **init**.py
+- ## tests/
 - .env
 - .flaskenv
 - instance/
-    - file.db
+  - file.db
 
 ## How to generate table of database?
+
 - go to command and write `flask shell`
 - `from flaskr.database.database import db`
 - `db.create_all()`
@@ -80,4 +81,7 @@ Command (CMD / Bash):
 
 - `SQLAlchemy`
 
-### After install Flask-SQLAlchemy: pip install Flask-SQLAlchemy
+### After install validators: pip install validators
+
+- `validators`
+- `decorator`
