@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 import os
 from flaskr.routes.auth import auth
 from flaskr.routes.bookmarks import bookmark
+from flaskr.database.database import db
 
 # berisi kode untuk membuat dan mengonfigurasi objek aplikasi Flask, dan mungkin mendaftarkan blueprint atau modul lain yang relevan dengan aplikasi ini.
 
@@ -11,14 +12,16 @@ def create_app(test_config=None):
 
     if test_config is None:
         app.config.from_mapping(
-            SECRET_KEY=os.environ.get("SECRET_KEY")
+            SECRET_KEY=os.environ.get("SECRET_KEY"),
+            SQLALCHEMY_DATABASE_URI=os.environ.get("SQLALCHEMY_DB_URI")
         )
 
     else:
         app.config.from_mapping(
             test_config
         )
-
+    db.app = app
+    db.init_app(app)
     blueprints = [bookmark, auth]
 
     for bp in blueprints:
