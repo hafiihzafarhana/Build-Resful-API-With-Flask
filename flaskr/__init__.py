@@ -3,6 +3,7 @@ import os
 from flaskr.routes.auth import auth
 from flaskr.routes.bookmarks import bookmark
 from flaskr.database.database import db
+from flask_jwt_extended import JWTManager
 
 # berisi kode untuk membuat dan mengonfigurasi objek aplikasi Flask, dan mungkin mendaftarkan blueprint atau modul lain yang relevan dengan aplikasi ini.
 
@@ -14,7 +15,8 @@ def create_app(test_config=None):
         app.config.from_mapping(
             SECRET_KEY=os.environ.get("SECRET_KEY"),
             SQLALCHEMY_DATABASE_URI=os.environ.get("SQLALCHEMY_DB_URI"),
-            SQLALCHEMY_TRACK_MODIFICATIONS=False
+            SQLALCHEMY_TRACK_MODIFICATIONS=False,
+            JWT_SECRET_KEY=os.environ.get("JWT_SECRET_KEY")
         )
 
     else:
@@ -24,6 +26,8 @@ def create_app(test_config=None):
     db.app = app
     db.init_app(app)
     blueprints = [bookmark, auth]
+
+    JWTManager(app)
 
     for bp in blueprints:
         app.register_blueprint(bp)

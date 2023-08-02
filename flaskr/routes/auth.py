@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
-from flaskr.constants.http_status_codes import HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT, HTTP_201_CREATED
+from flaskr.constants.http_status_codes import HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT, HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_200_OK
 import validators
 from flaskr.database.database import User, db
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 # auth menajadi nama
 # __name__ digunakan untuk mengatur dimana blueprint akan berjalan
@@ -72,4 +73,28 @@ def me():
 
 @auth.post("/login")
 def login():
-    return "login"
+    #  ' ' is default value
+    email = request.json.get('email', '')
+    password = request.json.get('password', '')
+
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        is_past_correct = check_password_hash(user.password, password)
+
+        if is_past_correct:
+            refresh_token = create_refresh_token(identity=user.id)
+            access_token = create_access_token(identity=user.id)
+
+            return jsonify({
+                'message': 'User login',
+                'status': 'OK',
+                'data': {
+                    "refresh_token": refresh_token,
+                    "access_token": access_token,
+                }
+            }), HTTP_200_OK
+
+    return jsonify({
+        'message': "User not found"
+    }), HTTP_404_NOT_FOUND

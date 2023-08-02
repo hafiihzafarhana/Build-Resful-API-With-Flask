@@ -42,8 +42,8 @@ Command (CMD / Bash):
   - static
   - templates
   - utils
-  - **init**.py
-- ## tests/
+  - `__init__.py`
+- tests/
 - .env
 - .flaskenv
 - instance/
@@ -85,3 +85,7 @@ Command (CMD / Bash):
 
 - `validators`
 - `decorator`
+
+### After install validators: pip install flask-jwt-extended
+
+- `flask-jwt-extended`
