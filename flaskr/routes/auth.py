@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.constants.http_status_codes import HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT, HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_200_OK
 import validators
 from flaskr.database.database import User, db
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 
 # auth menajadi nama
 # __name__ digunakan untuk mengatur dimana blueprint akan berjalan
@@ -67,8 +67,20 @@ def register():
 
 
 @auth.get("/me")
+@jwt_required()
 def me():
-    return "me"
+    user_id = get_jwt_identity()
+
+    data = User.query.filter_by(id=user_id).first()
+
+    return jsonify({
+        'message': 'Get me',
+        'status': 'OK',
+        'data': {
+            "username": data.username,
+            "email": data.email,
+        }
+    }), HTTP_200_OK
 
 
 @auth.post("/login")
