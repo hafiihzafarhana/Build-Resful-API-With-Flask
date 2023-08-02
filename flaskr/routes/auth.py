@@ -110,3 +110,17 @@ def login():
     return jsonify({
         'message': "User not found"
     }), HTTP_404_NOT_FOUND
+
+
+@auth.get("/refresh-token")
+@jwt_required(refresh=True)
+def refresh_token():
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    return jsonify({
+        'message': 'Success generate access token',
+        'status': 'OK',
+        'data': {
+            "access_token": access_token,
+        }
+    }), HTTP_200_OK
