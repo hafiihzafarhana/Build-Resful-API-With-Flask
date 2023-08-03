@@ -61,7 +61,13 @@ def bookmark_do_a(bookmark_id):
         }), HTTP_200_OK
 
     if request.method == 'DELETE':
-        pass
+        db.session.delete(bookmark)
+        db.session.commit()
+
+        return jsonify({
+            'message': f'Delete bookmark by id {bookmark.id}',
+            'status': 'SUCCESS',
+        }), HTTP_200_OK
     return
 
 
