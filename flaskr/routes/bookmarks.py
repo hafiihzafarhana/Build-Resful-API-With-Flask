@@ -15,14 +15,39 @@ def bookmark_do_a(bookmark_id):
     user_id = get_jwt_identity()
     bookmark = Bookmark.query.filter_by(
         user_id=user_id, id=bookmark_id).first()
-    if request.method == 'PUT':
-        pass
-    if request.method == 'GET':
-        if not bookmark:
-            return jsonify({
-                'message': f"Bookmark not found or can't access by user with id {user_id}"
-            }), HTTP_404_NOT_FOUND
 
+    if not bookmark:
+        return jsonify({
+            'message': f"Bookmark not found or can't access by user with id {user_id}"
+        }), HTTP_404_NOT_FOUND
+
+    if request.method == 'PUT':
+        body = request.get_json().get('body', '')
+        url = request.get_json().get('url', '')
+
+        if not validators.url(url):
+            return jsonify({
+                'message': "Fill with valid url"
+            }), HTTP_400_BAD_REQUEST
+
+        bookmark.url = url
+        bookmark.body = body
+
+        db.session.commit()
+
+        return jsonify({
+            'message': f'Update bookmark by id {bookmark.id}',
+            'status': 'SUCCESS',
+            'data': {
+                "body": bookmark.body,
+                "url": bookmark.url,
+                "user_id": bookmark.user_id,
+                "short_url": bookmark.short_url,
+                "visitor": bookmark.visitor
+            }
+        }), HTTP_200_OK
+
+    if request.method == 'GET':
         return jsonify({
             'message': f'Get bookmark by id {bookmark.id}',
             'status': 'SUCCESS',
