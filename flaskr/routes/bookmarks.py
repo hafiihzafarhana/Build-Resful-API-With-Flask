@@ -45,7 +45,12 @@ def bookmark_a():
         }), HTTP_201_CREATED
 
     if request.method == 'GET':
-        bookmarks = Bookmark.query.filter_by(user_id=user_id)
+        # Give pagination
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 5, type=int)
+
+        bookmarks = Bookmark.query.filter_by(
+            user_id=user_id).paginate(page=page, per_page=per_page)
 
         data = []
 
@@ -58,8 +63,18 @@ def bookmark_a():
                 "visitor": item.visitor
             })
 
+        meta_data = {
+            "page": bookmarks.page,
+            "count_pages": bookmarks.pages,
+            "total_datas": bookmarks.total,
+            "prev_page": bookmarks.prev_num,
+            "next_page": bookmarks.next_num,
+            "has_next": bookmarks.has_next,
+            "has_prev": bookmarks.has_prev
+        }
+
         return jsonify({
             'message': 'Get Bookmarks',
             'status': 'SUCCESS',
-            'data': data
+            'data': {"bookmark_data": data, "pagination_data": meta_data}
         }), HTTP_200_OK
