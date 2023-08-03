@@ -140,3 +140,26 @@ def bookmark_do_b():
             'status': 'SUCCESS',
             'data': {"bookmark_data": data, "pagination_data": meta_data}
         }), HTTP_200_OK
+
+
+@bookmark.get("/statistic")
+@jwt_required()
+def statistic_data():
+    user_id = get_jwt_identity()
+    items = Bookmark.query.filter_by(user_id=user_id).all()
+
+    data = []
+
+    for item in items:
+        data.append({
+            "url": item.url,
+            "user_id": item.user_id,
+            "short_url": item.short_url,
+            "visitor": item.visitor
+        })
+
+    return jsonify({
+        'message': 'Get bookmarks statistic',
+        'status': 'SUCCESS',
+        'data': data
+    }), HTTP_200_OK
