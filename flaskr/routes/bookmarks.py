@@ -9,9 +9,40 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 bookmark = Blueprint("bookmark", __name__, url_prefix="/api/bookmark")
 
 
+@bookmark.route("/<int:bookmark_id>", methods=['PUT', 'GET', "DELETE"])
+@jwt_required()
+def bookmark_do_a(bookmark_id):
+    user_id = get_jwt_identity()
+    bookmark = Bookmark.query.filter_by(
+        user_id=user_id, id=bookmark_id).first()
+    if request.method == 'PUT':
+        pass
+    if request.method == 'GET':
+        if not bookmark:
+            return jsonify({
+                'message': f"Bookmark not found or can't access by user with id {user_id}"
+            }), HTTP_404_NOT_FOUND
+
+        return jsonify({
+            'message': f'Get bookmark by id {bookmark.id}',
+            'status': 'SUCCESS',
+            'data': {
+                "body": bookmark.body,
+                "url": bookmark.url,
+                "user_id": bookmark.user_id,
+                "short_url": bookmark.short_url,
+                "visitor": bookmark.visitor
+            }
+        }), HTTP_200_OK
+
+    if request.method == 'DELETE':
+        pass
+    return
+
+
 @bookmark.route("/", methods=['POST', 'GET'])
 @jwt_required()
-def bookmark_a():
+def bookmark_do_b():
     user_id = get_jwt_identity()
     if request.method == 'POST':
         body = request.get_json().get('body', '')
@@ -74,7 +105,7 @@ def bookmark_a():
         }
 
         return jsonify({
-            'message': 'Get Bookmarks',
+            'message': 'Get bookmarks',
             'status': 'SUCCESS',
             'data': {"bookmark_data": data, "pagination_data": meta_data}
         }), HTTP_200_OK
